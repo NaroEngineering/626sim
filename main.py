@@ -5,10 +5,10 @@ from datetime import datetime
 from environment import Environment
 from game_window import GameWindow
 from user_input import get_user_input
+import time
+
 
 def main():
-    print("DEBUG: main started")
-
     num_preds, num_prey, size, pred_hunger, prey_hunger, food_rate, initial_food = get_user_input()
     entity_size = 5  # Size of each entity square
     window_size = size * entity_size  # Calculate the desired window size
@@ -16,20 +16,28 @@ def main():
     env = Environment(size, num_preds, num_prey, size, pred_hunger, prey_hunger, food_rate)
     game_window = GameWindow(size, entity_size)  # Pass the entity size to the GameWindow constructor
     running = True
+    step = 0
 
     while running:
-        print("DEBUG: main loop iteration started")
+        start_time = time.time()  # Start the timer
 
         env.update()
         game_window.draw(env.cells)
-
-        # End simulation if no predators or prey for 200 consecutive steps
-        if all(count == 0 for count in env.consecutive_zero_counts["Predator"]) or \
-           all(count == 0 for count in env.consecutive_zero_counts["Prey"]):
+        
+        # End simulation if number of predators and prey is 0
+        if env.entity_counts["Predator"][-1] == 0 and env.entity_counts["Prey"][-1] == 0:
             running = False
-        print("DEBUG: main finished")
-  
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
 
+        end_time = time.time()  # End the timer
+        elapsed_time = end_time - start_time  # Calculate elapsed time
+        
+        print(f"Step {step} completed in {elapsed_time} seconds.")
+        
+        step += 1  # Increment the step counter
 
     # Create directory for data if it doesn't exist
     if not os.path.exists('lot626data'):
@@ -54,4 +62,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

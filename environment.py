@@ -9,8 +9,6 @@ class Environment:
         self.cells = [[Cell() for _ in range(size)] for _ in range(size)]
         self.entity_counts = {"Predator": [], "Prey": [], "Food": []}
         self.time_steps = []
-        self.consecutive_zero_counts = {"Predator": [0]*200, "Prey": [0]*200}
-
 
         self.pred_hunger = pred_hunger
         self.prey_hunger = prey_hunger
@@ -39,8 +37,6 @@ class Environment:
         return nearby_entities
 
     def update(self):
-        print("DEBUG: environment update started")
-
         new_cells = [[Cell() for _ in range(self.size)] for _ in range(self.size)]  # Prepare empty new cells
 
         for i, row in enumerate(self.cells):
@@ -48,8 +44,6 @@ class Environment:
                 for entity in cell.entities:
                     if not entity.alive:
                         continue
-    
-                    print(f"DEBUG: updating entity {entity} at cell ({i}, {j})")
 
                     # Get movement directions
                     dx, dy = entity.move()
@@ -84,23 +78,15 @@ class Environment:
                             entity.kill()
 
         self.cells = new_cells
-        print("DEBUG: environment update finished")
 
-
-        n_food = int(50 * self.food_rate)  # Adjust the number of food based on the food rate
+        n_food = int(10 * self.food_rate)  # Adjust the number of food based on the food rate
         self.add_food(n_food)
-    
+        
         for entity_type in self.entity_counts.keys():
             if entity_type == "Food":
                 self.entity_counts[entity_type].append(sum(isinstance(e, eval(entity_type)) for row in self.cells for cell in row for e in cell.entities))
             else:
                 self.entity_counts[entity_type].append(sum(isinstance(e, eval(entity_type)) and e.alive for row in self.cells for cell in row for e in cell.entities))
-                
-                # Only update consecutive_zero_counts for non-Food entities
-                self.consecutive_zero_counts[entity_type].pop(0)
-                count = sum(isinstance(e, eval(entity_type)) and e.alive for row in self.cells for cell in row for e in cell.entities)
-                self.consecutive_zero_counts[entity_type].append(count)
-
 
         self.time_steps.append(self.time_steps[-1] + 1 if self.time_steps else 0)
 
@@ -127,7 +113,7 @@ class Environment:
             (mid_point - spawn_square_radius, mid_point + spawn_square_radius),
         ]
 
-        for _ in range(int(n_food * 0.5)):  # 90% of the food is around the square
+        for _ in range(int(n_food * 0.1)):  # 90% of the food is around the square
             # Choose a random corner for each food entity
             spawn_x, spawn_y = random.choice(spawn_points)
             # Add randomness to the spawn location
@@ -136,7 +122,7 @@ class Environment:
 
             self.cells[x][y].entities.append(Food(0, 0))  # Food is added at position (0, 0) relative to the cell
 
-        for _ in range(int(n_food * 0.5)):  # Remaining 10% of the food is random within the box
+        for _ in range(int(n_food * 0.9)):  # Remaining 10% of the food is random within the box
             x, y = np.random.randint(0, self.size, 2)
             self.cells[x][y].entities.append(Food(0, 0))  # Food is added at position (0, 0) relative to the cell
 

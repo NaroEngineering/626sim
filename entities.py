@@ -22,8 +22,6 @@ class Entity:
         self._alive = False
 
     def move(self):
-        print(f"DEBUG: moving entity {self}")
-
         dx, dy = np.random.randint(-1, 2, 2)  # Random move direction
         self._x += dx
         self._y += dy
@@ -47,8 +45,6 @@ class Predator(Entity):
         return offspring
 
     def update(self, cell):
-        print(f"DEBUG: updating predator {self}")
-
         if not self.alive:
             return
 
@@ -78,8 +74,6 @@ class Prey(Entity):
         return offspring
 
     def update(self, cell):
-        print(f"DEBUG: updating prey {self}")
-        
         if not self.alive:
             return
 

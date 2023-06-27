@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import simpledialog
 import random
 
-defaults = {'num_preds': 100, 'num_prey': 200, 'pred_hunger': 100, 'prey_hunger': 100, 'size': 150, 'food_rate': .25, 'initial_food': 200}
+defaults = {'num_preds': 100, 'num_prey': 200, 'pred_hunger': 100, 'prey_hunger': 100, 'size': 150, 'food_rate': 1, 'initial_food': 200}
 
 class ParameterDialog(simpledialog.Dialog):
     def body(self, master):
