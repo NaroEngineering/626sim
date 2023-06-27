@@ -39,6 +39,8 @@ class Environment:
         return nearby_entities
 
     def update(self):
+        print("DEBUG: environment update started")
+
         new_cells = [[Cell() for _ in range(self.size)] for _ in range(self.size)]  # Prepare empty new cells
 
         for i, row in enumerate(self.cells):
@@ -46,6 +48,8 @@ class Environment:
                 for entity in cell.entities:
                     if not entity.alive:
                         continue
+    
+                    print(f"DEBUG: updating entity {entity} at cell ({i}, {j})")
 
                     # Get movement directions
                     dx, dy = entity.move()
@@ -80,22 +84,19 @@ class Environment:
                             entity.kill()
 
         self.cells = new_cells
+        print("DEBUG: environment update finished")
+
 
         n_food = int(50 * self.food_rate)  # Adjust the number of food based on the food rate
         self.add_food(n_food)
-        
+    
         for entity_type in self.entity_counts.keys():
             if entity_type == "Food":
                 self.entity_counts[entity_type].append(sum(isinstance(e, eval(entity_type)) for row in self.cells for cell in row for e in cell.entities))
             else:
                 self.entity_counts[entity_type].append(sum(isinstance(e, eval(entity_type)) and e.alive for row in self.cells for cell in row for e in cell.entities))
-            self.consecutive_zero_counts[entity_type].pop(0)
-            if entity_type == "Food":
-                count = sum(isinstance(e, eval(entity_type)) for row in self.cells for cell in row for e in cell.entities)
-            else:
-                count = sum(isinstance(e, eval(entity_type)) and e.alive for row in self.cells for cell in row for e in cell.entities)
-            self.consecutive_zero_counts[entity_type].append(count)
-            if entity_type in self.consecutive_zero_counts:  # Check if it's either 'Predator' or 'Prey'
+                
+                # Only update consecutive_zero_counts for non-Food entities
                 self.consecutive_zero_counts[entity_type].pop(0)
                 count = sum(isinstance(e, eval(entity_type)) and e.alive for row in self.cells for cell in row for e in cell.entities)
                 self.consecutive_zero_counts[entity_type].append(count)

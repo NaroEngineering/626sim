@@ -7,6 +7,8 @@ from game_window import GameWindow
 from user_input import get_user_input
 
 def main():
+    print("DEBUG: main started")
+
     num_preds, num_prey, size, pred_hunger, prey_hunger, food_rate, initial_food = get_user_input()
     entity_size = 5  # Size of each entity square
     window_size = size * entity_size  # Calculate the desired window size
@@ -16,6 +18,8 @@ def main():
     running = True
 
     while running:
+        print("DEBUG: main loop iteration started")
+
         env.update()
         game_window.draw(env.cells)
 
@@ -23,6 +27,9 @@ def main():
         if all(count == 0 for count in env.consecutive_zero_counts["Predator"]) or \
            all(count == 0 for count in env.consecutive_zero_counts["Prey"]):
             running = False
+        print("DEBUG: main finished")
+  
+
 
     # Create directory for data if it doesn't exist
     if not os.path.exists('lot626data'):
