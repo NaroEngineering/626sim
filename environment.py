@@ -4,7 +4,7 @@ from entities import Predator, Prey, Food
 
 
 class Environment:
-    def __init__(self, size, n_predators, n_prey, n_food, pred_hunger, prey_hunger, food_rate):
+    def __init__(self, size, n_predators, n_prey, n_food, pred_hunger, prey_hunger, food_rate, randomness_error, spoil_date):
         self.size = size
         self.cells = [[Cell() for _ in range(size)] for _ in range(size)]
         self.entity_counts = {"Predator": [], "Prey": [], "Food": []}
@@ -21,12 +21,18 @@ class Environment:
             self.add_entity(Prey, self.prey_hunger)
 
         for _ in range(n_food):
-            self.add_entity(Food)
+            self.add_entity(Food, spoil_date=spoil_date)
 
-    def add_entity(self, entity_type, hunger=None):
+    def add_entity(self, entity_type, hunger=None, spoil_date=None):
         x, y = np.random.randint(0, self.size, 2)
-        entity = entity_type(x, y, hunger) if hunger is not None else entity_type(x, y)
+        if entity_type == Food:
+            entity = entity_type(x, y, spoil_date)
+        elif hunger is not None:
+            entity = entity_type(x, y, hunger)
+        else:
+            entity = entity_type(x, y)
         self.cells[x][y].entities.append(entity)
+
 
     def get_nearby_entities(self, x, y):
         nearby_entities = []
@@ -90,19 +96,10 @@ class Environment:
 
         self.time_steps.append(self.time_steps[-1] + 1 if self.time_steps else 0)
 
-        for entity in cell.entities:
-            old_position = entity.position
-            entity.update(cell)
-            new_position = entity.position
-
-            # If the entity has moved, remove it from the current cell's entities
-            if old_position != new_position:
-                cell.entities.remove(entity)
-
 
     def add_food(self, n_food):
         spawn_square_radius = self.size // 4  # Half the side length of the spawn square
-        spawn_random_radius = spawn_square_radius // 10  # Randomness radius is 10% of the square's side length
+        spawn_random_radius = spawn_square_radius // 25  # Randomness radius is 10% of the square's side length
         mid_point = self.size // 2  # The center of the environment
 
         # Four corners of the spawn square
@@ -120,11 +117,15 @@ class Environment:
             x = np.random.randint(spawn_x - spawn_random_radius, spawn_x + spawn_random_radius) % self.size
             y = np.random.randint(spawn_y - spawn_random_radius, spawn_y + spawn_random_radius) % self.size
 
-            self.cells[x][y].entities.append(Food(0, 0))  # Food is added at position (0, 0) relative to the cell
+            spoil_date = 10  # Define spoil_date here, adjust value as necessary
+            self.cells[x][y].entities.append(Food(0, 0, spoil_date))  # Food is added at position (0, 0) relative to the cell
+            # Food is added at position (0, 0) relative to the cell
 
-        for _ in range(int(n_food * 0.9)):  # Remaining 10% of the food is random within the box
+        for _ in range(int(n_food * 1)):  # Remaining 10% of the food is random within the box
             x, y = np.random.randint(0, self.size, 2)
-            self.cells[x][y].entities.append(Food(0, 0))  # Food is added at position (0, 0) relative to the cell
+            spoil_date = 10  # Define spoil_date here, adjust value as necessary
+            self.cells[x][y].entities.append(Food(0, 0, spoil_date))  # Food is added at position (0, 0) relative to the cell
+                # Food is added at position (0, 0) relative to the cell
 
 
     def entities(self):

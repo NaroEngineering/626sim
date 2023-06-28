@@ -1,8 +1,36 @@
 import tkinter as tk
 from tkinter import simpledialog
 import random
+import pickle
 
-defaults = {'num_preds': 100, 'num_prey': 200, 'pred_hunger': 100, 'prey_hunger': 100, 'size': 150, 'food_rate': 1, 'initial_food': 200}
+
+try:
+    with open("user_input_data.pkl", "rb") as f:
+        loaded_defaults = pickle.load(f)
+        defaults = {
+            'num_preds': loaded_defaults.get('num_preds', 100),
+            'num_prey': loaded_defaults.get('num_prey', 200),
+            'pred_hunger': loaded_defaults.get('pred_hunger', 200),
+            'prey_hunger': loaded_defaults.get('prey_hunger', 100),
+            'size': loaded_defaults.get('size', 150),
+            'food_rate': loaded_defaults.get('food_rate', 1),
+            'initial_food': loaded_defaults.get('initial_food', 200),
+            'randomness_error': loaded_defaults.get('randomness_error', 200),
+            'spoil_date': loaded_defaults.get('spoil_date', 50)  # Added this line
+        }
+except FileNotFoundError:
+    defaults = {
+        'num_preds': 100,
+        'num_prey': 200,
+        'pred_hunger': 200,
+        'prey_hunger': 100,
+        'size': 150,
+        'food_rate': 1,
+        'initial_food': 200,
+        'randomness_error': 200,
+        'spoil_date': 50  # Added this line
+    }
+
 
 class ParameterDialog(simpledialog.Dialog):
     def body(self, master):
@@ -13,6 +41,8 @@ class ParameterDialog(simpledialog.Dialog):
         tk.Label(master, text="Size:").grid(row=4, sticky='W', padx=10, pady=5)
         tk.Label(master, text="Food Rate:").grid(row=5, sticky='W', padx=10, pady=5)
         tk.Label(master, text="Initial Food:").grid(row=6, sticky='W', padx=10, pady=5)
+        tk.Label(master, text="Randomness Error (%):").grid(row=7, sticky='W', padx=10, pady=5)
+        tk.Label(master, text="Food Spoil Date:").grid(row=8, sticky='W', padx=10, pady=5)
 
         self.pred_entry = tk.Entry(master)
         self.pred_entry.insert(0, defaults['num_preds'])
@@ -42,11 +72,14 @@ class ParameterDialog(simpledialog.Dialog):
         self.initial_food_entry.insert(0, defaults['initial_food'])
         self.initial_food_entry.grid(row=6, column=1, padx=10, pady=5)
 
-        tk.Label(master, text="Randomness Error (%):").grid(row=7, sticky='W', padx=10, pady=5)
-
         self.randomness_error_entry = tk.Entry(master)
-        self.randomness_error_entry.insert(0, 5)  # 5% by default
+        self.randomness_error_entry.insert(0, 0)  # 5% by default
         self.randomness_error_entry.grid(row=7, column=1, padx=10, pady=5)
+
+        self.spoil_date_entry = tk.Entry(master)
+        self.spoil_date_entry.insert(0, defaults['spoil_date'])
+        self.spoil_date_entry.grid(row=8, column=1, padx=10, pady=5)
+
 
         return self.pred_entry  # initial focus
 
@@ -72,7 +105,8 @@ class ParameterDialog(simpledialog.Dialog):
         size = int(self.size_entry.get())
         food_rate = float(self.food_rate_entry.get())
         initial_food = int(self.initial_food_entry.get())
-        
+        spoil_date = int(self.spoil_date_entry.get())
+
         randomness_error = int(self.randomness_error_entry.get()) / 100.0
 
         num_preds += random.randint(-int(randomness_error * num_preds), int(randomness_error * num_preds))
@@ -82,14 +116,32 @@ class ParameterDialog(simpledialog.Dialog):
         size += random.randint(-int(randomness_error * size), int(randomness_error * size))
         food_rate += random.uniform(-randomness_error * food_rate, randomness_error * food_rate)
         initial_food += random.randint(-int(randomness_error * initial_food), int(randomness_error * initial_food))
+        spoil_date += random.randint(-int(randomness_error * spoil_date), int(randomness_error * spoil_date))
 
-        self.result = num_preds, num_prey, size, pred_hunger, prey_hunger, food_rate, initial_food
+        self.result = num_preds, num_prey, size, pred_hunger, prey_hunger, food_rate, initial_food, spoil_date, randomness_error
+
+        # Write user inputs to the pickle file
+        with open("user_input_data.pkl", "wb") as f:
+            data = {
+                "num_preds": num_preds,
+                "num_prey": num_prey,
+                "size": size,
+                "pred_hunger": pred_hunger,
+                "prey_hunger": prey_hunger,
+                "food_rate": food_rate,
+                "initial_food": initial_food,
+                "randomness_error": randomness_error,
+                "spoil_date": spoil_date,
+            }
+            pickle.dump(data, f)
 
         # Update default values
         defaults.update(
             num_preds=num_preds, num_prey=num_prey, size=size, pred_hunger=pred_hunger,
-            prey_hunger=prey_hunger, food_rate=food_rate, initial_food=initial_food
+            prey_hunger=prey_hunger, food_rate=food_rate, initial_food=initial_food, randomness_error=randomness_error,
+            spoil_date=spoil_date
         )
+
 
 
 def get_user_input():

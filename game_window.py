@@ -1,6 +1,7 @@
 import pygame
 from entities import Predator, Prey, Food
 
+
 class GameWindow:
     def __init__(self, size, entity_size):
         pygame.init()

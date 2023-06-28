@@ -41,14 +41,14 @@ class Predator(Entity):
 
     def eat(self):
         self.hunger += 1
-        offspring = self.reproduce(0.75)  # Adjust this rate as necessary
+        offspring = self.reproduce(1)  # Adjust this rate as necessary
         return offspring
 
     def update(self, cell):
         if not self.alive:
             return
 
-        self.hunger -= 5
+        self.hunger -= 1
         if self.hunger <= 0:
             self.kill()
 
@@ -70,14 +70,14 @@ class Prey(Entity):
 
     def eat(self):
         self.hunger += 1
-        offspring = self.reproduce(0.5)  # Adjust this rate as necessary
+        offspring = self.reproduce(1)  # Adjust this rate as necessary
         return offspring
 
     def update(self, cell):
         if not self.alive:
             return
 
-        self.hunger -= 5
+        self.hunger -= 1
         if self.hunger <= 0:
             self.kill()
 
@@ -94,5 +94,11 @@ class Food(Entity):
     def move(self):
         return 0, 0
 
-    def update(self, entities):
-        pass
+    def __init__(self, x, y, spoil_date):
+        super().__init__(x, y)
+        self.spoil_date = spoil_date
+
+    def update(self, environment):
+        self.spoil_date -= 1
+        if self.spoil_date <= 0:
+            environment.remove_entity(self)
