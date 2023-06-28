@@ -41,7 +41,7 @@ class Predator(Entity):
 
     def eat(self):
         self.hunger += 1
-        offspring = self.reproduce(1)  # Adjust this rate as necessary
+        offspring = self.reproduce(0.5)  # Adjust this rate as necessary
         return offspring
 
     def update(self, cell):

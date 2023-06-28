@@ -13,7 +13,7 @@ def main():
     entity_size = 5  # Size of each entity square
     window_size = size * entity_size  # Calculate the desired window size
 
-    env = Environment(size, num_preds, num_prey, size, pred_hunger, prey_hunger, food_rate, randomness_error,spoil_date)
+    env = Environment(size, num_preds, num_prey, size, pred_hunger, prey_hunger, food_rate, randomness_error, spoil_date)
     game_window = GameWindow(size, entity_size)  # Pass the entity size to the GameWindow constructor
     running = True
     step = 0
@@ -50,7 +50,7 @@ def main():
     plt.xlabel('Time steps')
     plt.ylabel('Number')
     plt.legend()
-    plt.title(f"#Pd={num_preds}_#py={num_prey}_#PdH={pred_hunger}_#Pyh={prey_hunger}")
+    plt.title(f"#Pd={num_preds}_#py={num_prey}_#PdH={pred_hunger}_#Pyh={prey_hunger}_food={food_rate}_Spoil{spoil_date}")
     
     # Save the figure
     filename = f"lot626data/num_preds={num_preds}_num_prey={num_prey}_{timestamp}.png"

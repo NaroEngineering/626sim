@@ -99,7 +99,7 @@ class Environment:
 
     def add_food(self, n_food):
         spawn_square_radius = self.size // 4  # Half the side length of the spawn square
-        spawn_random_radius = spawn_square_radius // 25  # Randomness radius is 10% of the square's side length
+        spawn_random_radius = spawn_square_radius // 30  # Randomness radius is 10% of the square's side length
         mid_point = self.size // 2  # The center of the environment
 
         # Four corners of the spawn square
@@ -110,20 +110,20 @@ class Environment:
             (mid_point - spawn_square_radius, mid_point + spawn_square_radius),
         ]
 
-        for _ in range(int(n_food * 0.1)):  # 90% of the food is around the square
+        for _ in range(int(n_food * .4)):  # 90% of the food is around the square
             # Choose a random corner for each food entity
             spawn_x, spawn_y = random.choice(spawn_points)
             # Add randomness to the spawn location
             x = np.random.randint(spawn_x - spawn_random_radius, spawn_x + spawn_random_radius) % self.size
             y = np.random.randint(spawn_y - spawn_random_radius, spawn_y + spawn_random_radius) % self.size
 
-            spoil_date = 10  # Define spoil_date here, adjust value as necessary
+            spoil_date = 15  # Define spoil_date here, adjust value as necessary
             self.cells[x][y].entities.append(Food(0, 0, spoil_date))  # Food is added at position (0, 0) relative to the cell
             # Food is added at position (0, 0) relative to the cell
 
         for _ in range(int(n_food * 1)):  # Remaining 10% of the food is random within the box
             x, y = np.random.randint(0, self.size, 2)
-            spoil_date = 10  # Define spoil_date here, adjust value as necessary
+            spoil_date = 15  # Define spoil_date here, adjust value as necessary
             self.cells[x][y].entities.append(Food(0, 0, spoil_date))  # Food is added at position (0, 0) relative to the cell
                 # Food is added at position (0, 0) relative to the cell
 
